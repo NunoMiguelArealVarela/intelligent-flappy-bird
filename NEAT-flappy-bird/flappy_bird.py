@@ -1,11 +1,8 @@
 """
-The classic game of flappy bird. Make with python
-and pygame. Features pixel perfect collision using masks :o
-
-Date Modified:  Jul 30, 2019
-Author: Tech With Tim
-Estimated Work Time: 5 hours (1 just for that damn collision)
+Referencia: Tech With Tim
+Modificado por: Nuno Morbey e Hugo Pereira
 """
+
 import pygame
 import random
 import os
@@ -13,7 +10,7 @@ import time
 import neat
 import visualize
 
-pygame.font.init()  # init font
+pygame.font.init()
 
 WIN_WIDTH = 600
 WIN_HEIGHT = 800
@@ -34,8 +31,8 @@ gen = 0
 
 class Bird:
     """
-    Bird class representing the flappy bird
-    """
+	Classe Bird que representa o pássaro do Flappy Bird
+	"""
     MAX_ROTATION = 25
     IMGS = bird_images
     ROT_VEL = 20
@@ -43,9 +40,9 @@ class Bird:
 
     def __init__(self, x, y):
         """
-        Initialize the object
-        :param x: starting x pos (int)
-        :param y: starting y pos (int)
+        Inicializa o objeto
+        :param x: posição inicial x (int)
+        :param y: posição inicial y (int)
         :return: None
         """
         self.x = x
@@ -59,8 +56,8 @@ class Bird:
 
     def jump(self):
         """
-        make the bird jump
-        :return: None
+        Faz o pássaro pular
+        
         """
         self.vel = -10.5
         self.tick_count = 0
@@ -68,15 +65,15 @@ class Bird:
 
     def move(self):
         """
-        make the bird move
-        :return: None
+        Faz o pássaro se mover
+        
         """
         self.tick_count += 1
 
-        # for downward acceleration
+        # para aceleração descendente
         displacement = self.vel*(self.tick_count) + 0.5*(3)*(self.tick_count)**2  # calculate displacement
 
-        # terminal velocity
+       # velocidade terminal
         if displacement >= 16:
             displacement = (displacement/abs(displacement)) * 16
 
@@ -88,19 +85,19 @@ class Bird:
         if displacement < 0 or self.y < self.height + 50:  # tilt up
             if self.tilt < self.MAX_ROTATION:
                 self.tilt = self.MAX_ROTATION
-        else:  # tilt down
+        else:  # inclinação para baixo
             if self.tilt > -90:
                 self.tilt -= self.ROT_VEL
 
     def draw(self, win):
         """
-        draw the bird
-        :param win: pygame window or surface
+        Desenha o pássaro
+        :param win: janela ou superfície do pygame
         :return: None
         """
         self.img_count += 1
 
-        # For animation of bird, loop through three images
+        # Para animação do pássaro, alterna entre três imagens
         if self.img_count <= self.ANIMATION_TIME:
             self.img = self.IMGS[0]
         elif self.img_count <= self.ANIMATION_TIME*2:
@@ -113,33 +110,33 @@ class Bird:
             self.img = self.IMGS[0]
             self.img_count = 0
 
-        # so when bird is nose diving it isn't flapping
+        # para que o pássaro não bata as asas ao mergulhar
         if self.tilt <= -80:
             self.img = self.IMGS[1]
             self.img_count = self.ANIMATION_TIME*2
 
 
-        # tilt the bird
+        # inclina o pássaro
         blitRotateCenter(win, self.img, (self.x, self.y), self.tilt)
 
     def get_mask(self):
         """
-        gets the mask for the current image of the bird
-        :return: None
+        Obtém a máscara para a imagem atual do pássaro
+        
         """
         return pygame.mask.from_surface(self.img)
 
 
 class Pipe():
     """
-    represents a pipe object
+    Representa como objeto o cano
     """
     GAP = 200
     VEL = 9
 
     def __init__(self, x):
         """
-        initialize pipe object
+        Inicializa o objeto de cano
         :param x: int
         :param y: int
         :return" None
@@ -147,7 +144,7 @@ class Pipe():
         self.x = x
         self.height = 0
 
-        # where the top and bottom of the pipe is
+        # onde está o topo e a base do cano
         self.top = 0
         self.bottom = 0
 
@@ -160,8 +157,7 @@ class Pipe():
 
     def set_height(self):
         """
-        set the height of the pipe, from the top of the screen
-        :return: None
+        Define a altura do cano, a partir do topo da tela
         """
         self.height = random.randrange(50, 450)
         self.top = self.height - self.PIPE_TOP.get_height()
@@ -169,27 +165,25 @@ class Pipe():
 
     def move(self):
         """
-        move pipe based on vel
-        :return: None
+        Move o cano com base na velocidade
         """
         self.x -= self.VEL
 
     def draw(self, win):
         """
-        draw both the top and bottom of the pipe
-        :param win: pygame window/surface
-        :return: None
+        Desenha o cano de cima e o cano de baixo
+        :param win: janela/superfície do pygame
         """
-        # draw top
+        # desenha o topo
         win.blit(self.PIPE_TOP, (self.x, self.top))
-        # draw bottom
+        # desenha o de baixo
         win.blit(self.PIPE_BOTTOM, (self.x, self.bottom))
 
 
     def collide(self, bird, win):
         """
-        returns if a point is colliding with the pipe
-        :param bird: Bird object
+        Verifica se um ponto está colidindo com o cano
+        :param bird: objeto Bird
         :return: Bool
         """
         bird_mask = bird.get_mask()
@@ -208,7 +202,7 @@ class Pipe():
 
 class Base:
     """
-    Represnts the moving floor of the game
+   Representa o chão móvel do jogo
     """
     VEL = 10
     WIDTH = base_img.get_width()
@@ -216,9 +210,8 @@ class Base:
 
     def __init__(self, y):
         """
-        Initialize the object
+        Inicializa o objeto
         :param y: int
-        :return: None
         """
         self.y = y
         self.x1 = 0
@@ -226,8 +219,7 @@ class Base:
 
     def move(self):
         """
-        move floor so it looks like its scrolling
-        :return: None
+        Move o chão para dar a sensação de rolagem
         """
         self.x1 -= self.VEL
         self.x2 -= self.VEL
@@ -239,9 +231,8 @@ class Base:
 
     def draw(self, win):
         """
-        Draw the floor. This is two images that move together.
-        :param win: the pygame surface/window
-        :return: None
+        Desenha o chão. São duas imagens que se movem juntas.
+        :param win: superfície/janela do pygame
         """
         win.blit(self.IMG, (self.x1, self.y))
         win.blit(self.IMG, (self.x2, self.y))
@@ -249,12 +240,11 @@ class Base:
 
 def blitRotateCenter(surf, image, topleft, angle):
     """
-    Rotate a surface and blit it to the window
-    :param surf: the surface to blit to
-    :param image: the image surface to rotate
-    :param topLeft: the top left position of the image
-    :param angle: a float value for angle
-    :return: None
+    Rotaciona uma superfície e a blita na janela
+    :param surf: a superfície para blitar
+    :param image: a superfície da imagem a ser rotacionada
+    :param topleft: a posição superior esquerda da imagem
+    :param angle: um valor de ângulo float
     """
     rotated_image = pygame.transform.rotate(image, angle)
     new_rect = rotated_image.get_rect(center = image.get_rect(topleft = topleft).center)
@@ -263,14 +253,14 @@ def blitRotateCenter(surf, image, topleft, angle):
 
 def draw_window(win, birds, pipes, base, score, gen, pipe_ind):
     """
-    draws the windows for the main game loop
-    :param win: pygame window surface
-    :param bird: a Bird object
-    :param pipes: List of pipes
-    :param score: score of the game (int)
-    :param gen: current generation
-    :param pipe_ind: index of closest pipe
-    :return: None
+    Desenha a janela para o loop principal do jogo
+    :param win: superfície da janela do pygame
+    :param birds: objeto Bird
+    :param pipes: lista de canos
+    :param base: objeto Base
+    :param score: pontuação do jogo (int)
+    :param gen: geração atual
+    :param pipe_ind: índice do cano mais próximo
     """
     if gen == 0:
         gen = 1
@@ -281,26 +271,26 @@ def draw_window(win, birds, pipes, base, score, gen, pipe_ind):
 
     base.draw(win)
     for bird in birds:
-        # draw lines from bird to pipe
+        # desenha linhas do pássaro ao cano
         if DRAW_LINES:
             try:
                 pygame.draw.line(win, (255,0,0), (bird.x+bird.img.get_width()/2, bird.y + bird.img.get_height()/2), (pipes[pipe_ind].x + pipes[pipe_ind].PIPE_TOP.get_width()/2, pipes[pipe_ind].height), 5)
                 pygame.draw.line(win, (255,0,0), (bird.x+bird.img.get_width()/2, bird.y + bird.img.get_height()/2), (pipes[pipe_ind].x + pipes[pipe_ind].PIPE_BOTTOM.get_width()/2, pipes[pipe_ind].bottom), 5)
             except:
                 pass
-        # draw bird
+        # desenha o pássaro
         bird.draw(win)
 
     # score
     score_label = STAT_FONT.render("Score: " + str(score),1,(255,255,255))
     win.blit(score_label, (WIN_WIDTH - score_label.get_width() - 15, 10))
 
-    # generations
-    score_label = STAT_FONT.render("Gens: " + str(gen-1),1,(255,255,255))
+    # gerações
+    score_label = STAT_FONT.render("Geração: " + str(gen-1),1,(255,255,255))
     win.blit(score_label, (10, 10))
 
-    # alive
-    score_label = STAT_FONT.render("Alive: " + str(len(birds)),1,(255,255,255))
+    # vivos
+    score_label = STAT_FONT.render("Vivos: " + str(len(birds)),1,(255,255,255))
     win.blit(score_label, (10, 50)) # x e o y do texto
 
     pygame.display.update()
@@ -308,17 +298,15 @@ def draw_window(win, birds, pipes, base, score, gen, pipe_ind):
 
 def eval_genomes(genomes, config):
     """
-    runs the simulation of the current population of
-    birds and sets their fitness based on the distance they
-    reach in the game.
+    Executa a simulação da população atual de pássaros e define sua aptidão com base na distância que alcançam no jogo.
     """
     global WIN, gen
     win = WIN
     gen += 1
 
-    # start by creating lists holding the genome itself, the
-    # neural network associated with the genome and the
-    # bird object that uses that network to play
+    # Comece criando listas que contenham o próprio genoma, a
+    # rede neural associada ao genoma e
+    # o objeto de pássaro que usa essa rede para jogar
     nets = []
     birds = []
     ge = []
@@ -351,14 +339,14 @@ def eval_genomes(genomes, config):
             if len(pipes) > 1 and birds[0].x > pipes[0].x + pipes[0].PIPE_TOP.get_width():  # determine whether to use the first or second
                 pipe_ind = 1                                                                 # pipe on the screen for neural network input
 
-        for x, bird in enumerate(birds):  # give each bird a fitness of 0.1 for each frame it stays alive
+        for x, bird in enumerate(birds): # dê a cada pássaro uma aptidão de 0.1 para cada frame que ele permanecer vivo
             ge[x].fitness += 0.1
             bird.move()
 
-            # send bird location, top pipe location and bottom pipe location and determine from network whether to jump or not
+            # enviar a localização do pássaro, a localização do cano superior e a localização do cano inferior e determinar pela rede neural se deve pular ou não
             output = nets[birds.index(bird)].activate((bird.y, abs(bird.y - pipes[pipe_ind].height), abs(bird.y - pipes[pipe_ind].bottom)))
 
-            if output[0] > 0.5:  # we use a tanh activation function so result will be between -1 and 1. if over 0.5 jump
+            if output[0] > 0.5:  # usamos uma função de ativação tangente hiperbólica, portanto, o resultado estará entre -1 e 1. se for maior que 0,5, ele dá jump
                 bird.jump()
 
 
@@ -369,7 +357,7 @@ def eval_genomes(genomes, config):
         add_pipe = False
         for pipe in pipes:
             pipe.move()
-            # check for collision
+            # verificar colisão
             for bird in birds:
                 if pipe.collide(bird, win):
                     ge[birds.index(bird)].fitness -= 1
@@ -386,7 +374,7 @@ def eval_genomes(genomes, config):
 
         if add_pipe:
             score += 1
-            # can add this line to give more reward for passing through a pipe (not required)
+            
             for genome in ge:
                 genome.fitness += 1 #mexer aqui
             pipes.append(Pipe(WIN_WIDTH))
@@ -402,32 +390,28 @@ def eval_genomes(genomes, config):
 
         draw_window(WIN, birds, pipes, base, score, gen, pipe_ind)
 
-        # break if score gets large enough
-        '''if score > 20:
-            pickle.dump(nets[0],open("best.pickle", "wb"))
-            break'''
 
 
 def run(config_file):
     """
-    runs the NEAT algorithm to train a neural network to play flappy bird.
-    :param config_file: location of config file
-    :return: None
+    Executa o algoritmo NEAT para treinar uma rede neural para jogar Flappy Bird.
+    :param config_file: localização do arquivo de configuração
+    
     """
     config = neat.config.Config(neat.DefaultGenome, neat.DefaultReproduction,
                          neat.DefaultSpeciesSet, neat.DefaultStagnation,
                          config_file)
 
-    # Create the population, which is the top-level object for a NEAT run.
+    # Crie a população, que é o objeto de nível superior para uma execução NEAT
     p = neat.Population(config)
 
-    # Add a stdout reporter to show progress in the terminal.
+    # Adicione um relator de stdout para mostrar o progresso no terminal
     p.add_reporter(neat.StdOutReporter(True))
     stats = neat.StatisticsReporter()
     p.add_reporter(stats)
     #p.add_reporter(neat.Checkpointer(5))
 
-    # quantas geraçoes vao fazer até fechar jogo
+    # quantas gerações serão executadas antes de encerrar o jogo
     winner = p.run(eval_genomes, 50)
 
     # show final stats
@@ -435,9 +419,8 @@ def run(config_file):
 
 
 if __name__ == '__main__':
-    # Determine path to configuration file. This path manipulation is
-    # here so that the script will run successfully regardless of the
-    # current working directory.
+    # Determine o caminho para o arquivo de configuração. Essa manipulação de caminho está aqui
+    # para que o script seja executado com êxito independentemente do diretório de trabalho atual.
     local_dir = os.path.dirname(__file__)
     config_path = os.path.join(local_dir, 'config-feedforward.txt')
     run(config_path)
